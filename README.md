@@ -7,6 +7,8 @@ This simple codebase allows one to connect to Datastax Astra and pull down speci
 
 This github repo is setup to deploy continuously to [Google Cloud Run](https://parking-lot-astra-ynv6tadumq-ue.a.run.app/) and can be called like below:
 
+Before running this sample, in your environment, make sure you have downloaded the secure connect bundle from your instance of Datastax Astra and saved in this folder as `creds.zip`
+
 ```shell
 http -v https://parking-lot-astra-ynv6tadumq-ue.a.run.app/slots/nasa_east/1
 
