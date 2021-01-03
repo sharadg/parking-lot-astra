@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# parking-lot-astra
-=======
 ## SensorsRUs MVP - Parking Lot Occupancy
 
 This simple codebase allows one to connect to Datastax Astra and pull down specific query results for the number of open slots at a particular floor of a specific Parking Lot.
@@ -31,4 +28,3 @@ content-type: text/html; charset=utf-8
 
 Total slots available for FloorNum: 1 at Parking Lot nasa_east are 4
 ```
->>>>>>> 615d73a (mvp commit)
