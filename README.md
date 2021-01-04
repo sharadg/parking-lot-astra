@@ -6,6 +6,9 @@ This github repo is setup to deploy continuously to [Google Cloud Run](https://p
 
 Before running this sample, in your environment, make sure you have downloaded the secure connect bundle from your instance of Datastax Astra and saved in this folder as `creds.zip`
 
+### Interacting with the REST APIs
+Look up Slots using this pattern `http -v https://parking-lot-astra-ynv6tadumq-ue.a.run.app/slots/{parking_lot}/{floor_num}`
+
 ```shell
 http -v https://parking-lot-astra-ynv6tadumq-ue.a.run.app/slots/nasa_east/1
 
@@ -28,3 +31,14 @@ content-type: text/html; charset=utf-8
 
 Total slots available for FloorNum: 1 at Parking Lot nasa_east are 4
 ```
+
+## Deployment to Cloud Run:
+1. Create a container build by using Dockerfile:
+```
+gcloud builds submit --tag gcr.io/fe-shgupta/parking-lot-astra
+```
+2. Deploy the container using Cloud Run:
+```
+gcloud run deploy --image=gcr.io/fe-shgupta/parking-lot-astra --platform=managed
+```
+
