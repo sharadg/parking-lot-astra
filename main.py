@@ -8,9 +8,9 @@ from flask import jsonify
 app = Flask(__name__)
 
 cloud_config = {
-    'secure_connect_bundle': './creds.zip'
+    'secure_connect_bundle': '/tmp/secure-connect-petclinic.zip'
 }
-auth_provider = PlainTextAuthProvider('petclinic', 'petclinic')
+auth_provider = PlainTextAuthProvider('gYkAszLdRdNZfPqFaLTUmUem', 'tCNepGtye_Whk9+jcGeFCo,ZyIiRwk5_1E8AZHwidFpk+KWrQnoGkS752UJ15nvTy5Z,X9jZ7,Ayg5ayEjj1Q2p.qWkLFfbCTcr.BalxmfpqlYDCo5Yxcv4l+2ZcWakZ')
 cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
 session = cluster.connect()
 session.set_keyspace("petclinickp")
