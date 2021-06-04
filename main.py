@@ -3,33 +3,40 @@ import os
 from flask import Flask
 from cassandra.cluster import Cluster
 from cassandra.auth import PlainTextAuthProvider
-from flask import jsonify
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# Astra DB keyspace
+astraKeyspace = os.environ.get("ASTRA_DB_KEYSPACE", "xxx")
+# Astra collection (think of it like a table) to create
+astraTable = os.environ.get("ASTRA_DB_TABLE", "xxx")
+# Client ID
+astraClientID = os.environ.get("ASTRA_DB_CLIENT_ID", "xxx")
+# Client Secret
+astraClientSecret = os.environ.get("ASTRA_DB_CLIENT_SECRET", "xxx")
 
 app = Flask(__name__)
 
 cloud_config = {
-    'secure_connect_bundle': '/tmp/secure-connect-petclinic.zip'
+    'secure_connect_bundle': './creds.zip'
 }
-auth_provider = PlainTextAuthProvider('gYkAszLdRdNZfPqFaLTUmUem', 'tCNepGtye_Whk9+jcGeFCo,ZyIiRwk5_1E8AZHwidFpk+KWrQnoGkS752UJ15nvTy5Z,X9jZ7,Ayg5ayEjj1Q2p.qWkLFfbCTcr.BalxmfpqlYDCo5Yxcv4l+2ZcWakZ')
+auth_provider = PlainTextAuthProvider(astraClientID, astraClientSecret)
 cluster = Cluster(cloud=cloud_config, auth_provider=auth_provider)
 session = cluster.connect()
-session.set_keyspace("petclinickp")
+session.set_keyspace(astraKeyspace)
 
 
 @app.route("/slots/<parking_lot>/<floor_num>", methods=["GET"])
 def lookup_available_slots(parking_lot, floor_num):
     global session
-    query = 'SELECT parking_lot, floor_num, sensor_slot, max(recorded_time), occupied FROM parking_lot_occupancy WHERE parking_lot=\'{parking_lot}\' AND floor_num = {floor_num} GROUP BY parking_lot, floor_num, sensor_slot ALLOW FILTERING ;'.format(
-        parking_lot=parking_lot, floor_num=floor_num)
-    rows = session.execute(query).all()
+    query = "SELECT parking_lot, floor_num, num_available FROM " + astraTable + f" WHERE parking_lot='{parking_lot}' AND floor_num = {floor_num} LIMIT 1 ;"
+    row = session.execute(query).one()
 
-    if rows:
-        slots = 0
-        for row in rows:
-            if not bool(row.occupied):
-                slots += 1
-            # print('Parking Lot: {pl}, FloorNum: {fn}, SensorSlot: {ss}, Occupied: {oc}'.format(pl=row.parking_lot, fn=row.floor_num, ss=row.sensor_slot, oc=row.occupied))
-        return 'Total slots available for FloorNum: {} at Parking Lot {} are {}'.format(floor_num, parking_lot, slots), 200
+    if row:
+        # print('Parking Lot: {pl}, FloorNum: {fn}, SensorSlot: {ss}, Occupied: {oc}'.format(pl=row.parking_lot, fn=row.floor_num, ss=row.sensor_slot, oc=row.occupied))
+        return 'Total slots available for FloorNum: {} at Parking Lot {} are {}'.format(floor_num, parking_lot,
+                                                                                        row.num_available), 200
     else:
         return "An error occurred", 500
 
